@@ -5,10 +5,9 @@ var THREE = require('three');
 
 var Scene = ReactTHREE.Scene;
 var PerspectiveCamera = ReactTHREE.PerspectiveCamera;
-var Cupcake = ReactTHREE.Cupcake;
 var MeshFactory = React.createFactory(ReactTHREE.Mesh);
 
-var assetpath = function(filename) { return '../assets/' + filename; };
+var assetpath = function(filename) { return 'assets/' + filename; };
 
 var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var cupcaketexture = THREE.ImageUtils.loadTexture( assetpath('cupCake.png') );
@@ -49,13 +48,28 @@ var Hello = React.createClass({
 
 var w = window.innerWidth-6;
 var h = window.innerHeight-6;
-var element = React.createElement(Hello, {
+
+var props = {
    width: w,
    height: h,
    cupcakedata: {
      position:new THREE.Vector3(0,0,0),
      quaternion:new THREE.Quaternion()
    }
- });
-ReactTHREE.render(element, document.querySelector('.container'));
-requestAnimationFrame(function(){});
+ };
+
+var element = React.createElement(Hello, props);
+
+function render(t){
+    console.log(t);
+    rotationangle = t*.001;
+    props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationangle, 3*rotationangle, 0));
+    props.cupcakedata.position.x = 300  * Math.sin(rotationangle);
+    element = React.createElement(Hello, props);
+
+
+    ReactTHREE.render(element, document.querySelector('.container'));
+    requestAnimationFrame(render);
+
+}
+render(0);
