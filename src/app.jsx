@@ -6,15 +6,18 @@ var THREE = require('three');
 var Scene = ReactTHREE.Scene;
 var PerspectiveCamera = ReactTHREE.PerspectiveCamera;
 var MeshFactory = React.createFactory(ReactTHREE.Mesh);
+var DirectionalLight = ReactTHREE.DirectionalLight;
+
 
 var assetpath = function(filename) { return 'assets/' + filename; };
 
 var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var cupcaketexture = THREE.ImageUtils.loadTexture( assetpath('cupCake.png') );
-var cupcakematerial = new THREE.MeshBasicMaterial( { map: cupcaketexture } );
+var cupcakematerial = new THREE.MeshPhongMaterial( { map: cupcaketexture } );
 
 var creamtexture = THREE.ImageUtils.loadTexture( assetpath('creamPink.png'));
-var creammaterial = new THREE.MeshBasicMaterial({map: creamtexture});
+var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
+
 
 var Cupcake = React.createClass({
   displayName: 'Cupcake',
@@ -31,6 +34,7 @@ var Cupcake = React.createClass({
     );
   }
 });
+var color = 0xff1250;
 
 var Hello = React.createClass({
     render: function() {
@@ -41,6 +45,7 @@ var Hello = React.createClass({
       return  <Scene width={this.props.width} height={this.props.height} camera="maincamera">
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
                 <Cupcake position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} />
+                <DirectionalLight position={new THREE.Vector3(0,0,1)} color={color} intensity={1} />
               </Scene>;
     }
 
