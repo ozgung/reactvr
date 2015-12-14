@@ -15,6 +15,11 @@ var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var cupcaketexture = THREE.ImageUtils.loadTexture( assetpath('cupCake.png') );
 var cupcakematerial = new THREE.MeshPhongMaterial( { map: cupcaketexture } );
 
+var typeface = require('three.regular.helvetiker');
+THREE.typeface_js.loadFace(typeface);
+
+var textgeometry = new THREE.TextGeometry("Ozgun",{font: 'helvetiker'});
+
 var creamtexture = THREE.ImageUtils.loadTexture( assetpath('creamPink.png'));
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 
@@ -29,7 +34,7 @@ var Cupcake = React.createClass({
     return React.createElement(
       ReactTHREE.Object3D,
       {quaternion:this.props.quaternion, position:this.props.position || new THREE.Vector3(0,0,0)},
-      MeshFactory({position:new THREE.Vector3(0,-100,0), geometry:boxgeometry, material:cupcakematerial}),
+      MeshFactory({position:new THREE.Vector3(0,-100,0), geometry:textgeometry, material:cupcakematerial}),
       MeshFactory({position:new THREE.Vector3(0, 100,0), geometry:boxgeometry, material:creammaterial})
     );
   }
@@ -41,7 +46,6 @@ var Hello = React.createClass({
       var aspectratio = this.props.width / this.props.height;
       var cameraprops = {fov:75, aspect:aspectratio, near:1, far:5000,
         position:new THREE.Vector3(0,0,600), lookat:new THREE.Vector3(0,0,0)};
-      console.log(this.props.cupcakedata)
       return  <Scene width={this.props.width} height={this.props.height} camera="maincamera">
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
                 <Cupcake position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} />
@@ -66,7 +70,6 @@ var props = {
 var element = React.createElement(Hello, props);
 
 function render(t){
-    console.log(t);
     rotationangle = t*.001;
     props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationangle, 3*rotationangle, 0));
     props.cupcakedata.position.x = 300  * Math.sin(rotationangle);
