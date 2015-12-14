@@ -51,8 +51,8 @@ var Hello = React.createClass({
 
 });
 
-var w = window.innerWidth-6;
-var h = window.innerHeight-6;
+var w = window.innerWidth;
+var h = window.innerHeight;
 
 var props = {
    width: w,
@@ -73,7 +73,7 @@ function render(t){
     element = React.createElement(Hello, props);
 
 
-    ReactTHREE.render(element, document.querySelector('.container'));
+    ReactTHREE.render(element, document.querySelector('#container'));
     requestAnimationFrame(render);
 
 }
