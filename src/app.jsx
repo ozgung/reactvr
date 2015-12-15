@@ -13,25 +13,25 @@ var Mesh = ReactTHREE.Mesh;
 var assetpath = function(filename) { return 'assets/' + filename; };
 var typeface = require('three.regular.helvetiker');
 THREE.typeface_js.loadFace(typeface);
-var color = 0xff1250;
+var color = 0xffffff;
 
 var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var spheregeometry = new THREE.SphereGeometry( 200,200,200);
 var cylindergeometry = new THREE.CylinderGeometry( 100, 100, 100, 100);
-var planegeometry = new THREE.PlaneGeometry( 1000, 1000, 100, 100);
+var planegeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100);
 var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 
 
-var cupcaketexture = THREE.ImageUtils.loadTexture( assetpath('cupCake.png') );
-var cupcakematerial = new THREE.MeshPhongMaterial( { map: cupcaketexture } );
-var solidmaterial = new THREE.MeshPhongMaterial( { color: color   } );
+var floortexture = THREE.ImageUtils.loadTexture( assetpath('sand.jpg') );
+var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
+var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
 
 var creamtexture = THREE.ImageUtils.loadTexture( assetpath('creamPink.png'));
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 
 
-var Cupcake = React.createClass({
-  displayName: 'Cupcake',
+var Robo = React.createClass({
+  displayName: 'Robo',
   propTypes: {
     position: React.PropTypes.instanceOf(THREE.Vector3),
     quaternion: React.PropTypes.instanceOf(THREE.Quaternion).isRequired
@@ -39,10 +39,10 @@ var Cupcake = React.createClass({
   render: function() {
     return React.createElement(
       ReactTHREE.Object3D,
-      {quaternion:this.props.quaternion, position:this.props.position || new THREE.Vector3(0,0,0)},
-      MeshFactory({position:new THREE.Vector3(0, +100,0), scale: new THREE.Vector3(.5,.5,.5), geometry: spheregeometry, material:cupcakematerial}),
+      {position:this.props.position || new THREE.Vector3(0,0,0)},
+      MeshFactory({position:new THREE.Vector3(0, +100,0), scale: new THREE.Vector3(.5,.5,.5), geometry: spheregeometry, material:floormaterial}),
       MeshFactory({position:new THREE.Vector3(0, +50,0), geometry:cylindergeometry, material:creammaterial}),
-      MeshFactory({position:new THREE.Vector3(0, -100,0), scale: new THREE.Vector3(1.05,1.05,1.05),  geometry:spheregeometry, material:creammaterial})
+      MeshFactory({position:new THREE.Vector3(0, -100,0), scale: new THREE.Vector3(1.05,1.05,1.05), quaternion:this.props.quaternion, geometry:spheregeometry, material:creammaterial})
     );
   }
 });
@@ -50,41 +50,91 @@ var Cupcake = React.createClass({
 var Hello = React.createClass({
     render: function() {
       var aspectratio = this.props.width / this.props.height;
-      var cameraprops = {fov:75, aspect:aspectratio, near:1, far:5000,
-        position:new THREE.Vector3(0,600,600), lookat:new THREE.Vector3(0,0,0)};
+      var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
+        position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+600, this.props.cupcakedata.position.z+600), lookat:this.props.cupcakedata.position};
       return  <Scene width={this.props.width} height={this.props.height} camera="maincamera">
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
-                <Cupcake position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} />
+                <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} />
                 <DirectionalLight position={new THREE.Vector3(0,0,1)} color={color} intensity={1} />
-                <Object3D quaternion={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2.2 )}>
-                  <Mesh position={new THREE.Vector3(0,-100,0)} geometry={planegeometry} material={solidmaterial} />
+                <Object3D quaternion={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2.0 )}>
+                  <Mesh position={new THREE.Vector3(0,0,0)} geometry={planegeometry} material={solidmaterial} />
                 </Object3D>
               </Scene>;
-    }
+    },
 
 });
 
 var w = window.innerWidth;
 var h = window.innerHeight;
 
+var Control = {
+  up: false,
+  down:false,
+  left: false,
+  right: false,
+  keyHandler: function(e){
+    e = e || window.event;
+    if (e.keyCode == '38') {
+      if (e.type == 'keydown') Control.up = true;
+      else if (e.type == 'keyup') Control.up = false;
+    }
+    if (e.keyCode == '40') {
+      if (e.type == 'keydown') Control.down = true;
+      else if (e.type == 'keyup') Control.down = false;
+    }
+    if (e.keyCode == '37') {
+      if (e.type == 'keydown') Control.left = true;
+      else if (e.type == 'keyup') Control.left = false;
+    }
+    if (e.keyCode == '39') {
+      if (e.type == 'keydown') Control.right = true;
+      else if (e.type == 'keyup') Control.right = false;
+    }
+    if (e.type == 'keyup' && 'C' == String.fromCharCode(e.keyCode)) {
+      props.cupcakedata.position = new THREE.Vector3(0,300,0);
+    }
+  }
+}
+
+
 var props = {
    width: w,
    height: h,
    cupcakedata: {
-     position:new THREE.Vector3(0,100,0),
+     position:new THREE.Vector3(0,300,0),
      quaternion:new THREE.Quaternion()
    }
  };
 
 var element = React.createElement(Hello, props);
 
+window.onkeydown = Control.keyHandler;
+window.onkeyup = Control.keyHandler;
+
+var xstep = 0, zstep = 0;
+var friction = 1.1
+
 function render(t){
-    rotationangle = 0;t*.001;
+    rotationangle = t*.001;
     props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationangle, 3*rotationangle, 0));
-    props.cupcakedata.position.x = 300  * Math.sin(rotationangle);
+    //props.cupcakedata.position.x = 300  * Math.sin(rotationangle);
+
+    if (Control.up) zstep -= 1
+    else if (Control.down) zstep += 1
+    else zstep /= friction;
+
+    if (Control.left) xstep -= 1
+    else if (Control.right) xstep += 1
+    else xstep /= friction;
+
+    props.cupcakedata.position.z += zstep;
+    //if (Control.down) props.cupcakedata.position.z += zstep;
+    props.cupcakedata.position.x += xstep;
+    //if (Control.right) props.cupcakedata.position.x += xstep;
+
+
+
     element = React.createElement(Hello, props);
-
-
     ReactTHREE.render(element, document.querySelector('#container'));
     requestAnimationFrame(render);
 
