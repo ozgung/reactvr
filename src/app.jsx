@@ -26,7 +26,7 @@ var floortexture = THREE.ImageUtils.loadTexture( assetpath('sand.jpg') );
 var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
 var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
 
-var creamtexture = THREE.ImageUtils.loadTexture( assetpath('creamPink.png'));
+var creamtexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 
 
@@ -40,7 +40,7 @@ var Robo = React.createClass({
     return React.createElement(
       ReactTHREE.Object3D,
       {position:this.props.position || new THREE.Vector3(0,0,0)},
-      MeshFactory({position:new THREE.Vector3(0, +100,0), scale: new THREE.Vector3(.5,.5,.5), geometry: spheregeometry, material:floormaterial}),
+      MeshFactory({position:new THREE.Vector3(0, +100,0), scale: new THREE.Vector3(.5,.5,.5), geometry: spheregeometry, material:creammaterial}),
       MeshFactory({position:new THREE.Vector3(0, +50,0), geometry:cylindergeometry, material:creammaterial}),
       MeshFactory({position:new THREE.Vector3(0, -100,0), scale: new THREE.Vector3(1.05,1.05,1.05), quaternion:this.props.quaternion, geometry:spheregeometry, material:creammaterial})
     );
