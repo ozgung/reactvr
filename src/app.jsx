@@ -22,7 +22,7 @@ var planegeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100);
 var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 
 
-var floortexture = THREE.ImageUtils.loadTexture( assetpath('sand.jpg') );
+var floortexture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
 var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
 var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
 
@@ -51,7 +51,7 @@ var Hello = React.createClass({
     render: function() {
       var aspectratio = this.props.width / this.props.height;
       var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
-        position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+600, this.props.cupcakedata.position.z+600), lookat:this.props.cupcakedata.position};
+        position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+1000, this.props.cupcakedata.position.z+1000), lookat:this.props.cupcakedata.position};
       return  <Scene width={this.props.width} height={this.props.height} camera="maincamera">
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
                 <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} />
