@@ -11,6 +11,7 @@ var SpotLight = ReactTHREE.SpotLight;
 var Object3D = ReactTHREE.Object3D;
 var Mesh = ReactTHREE.Mesh;
 
+
 var assetpath = function(filename) { return 'assets/' + filename; };
 var typeface = require('three.regular.helvetiker');
 THREE.typeface_js.loadFace(typeface);
@@ -24,7 +25,6 @@ var cylindergeometry = new THREE.CylinderGeometry( 102, 100, 40, 100);
 var planegeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100);
 var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 
-
 // Load textures
 var floortexture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
 var resume2texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc2.png') );
@@ -35,6 +35,9 @@ var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
 var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 var orangematerial = new THREE.MeshPhongMaterial({color: orange});
+
+// Stereo effect
+var effect = THREE.StereoEffect;
 
 // Robo component
 var Robo = React.createClass({
@@ -59,7 +62,7 @@ var VRScene = React.createClass({
       var aspectratio = this.props.width / this.props.height;
       var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
         position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+800, this.props.cupcakedata.position.z+1000), lookat:this.props.cupcakedata.position};
-      return  <Scene width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={false} >
+      return  <Scene ref="scene" effect={effect} width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={false} >
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
                 <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} castShadow={true} receiveShadow={false} />
                 <DirectionalLight position={new THREE.Vector3(1000,1000,1000)} color={white} intensity={1} />
@@ -71,6 +74,7 @@ var VRScene = React.createClass({
     },
 
 });
+
 
 var w = window.innerWidth;
 var h = window.innerHeight;
