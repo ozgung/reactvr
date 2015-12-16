@@ -13,7 +13,8 @@ var Mesh = ReactTHREE.Mesh;
 var assetpath = function(filename) { return 'assets/' + filename; };
 var typeface = require('three.regular.helvetiker');
 THREE.typeface_js.loadFace(typeface);
-var color = 0xffffff;
+
+var white = 0xffffff;
 
 var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var spheregeometry = new THREE.SphereGeometry( 200,200,200);
@@ -22,14 +23,17 @@ var planegeometry = new THREE.PlaneGeometry( 10000, 10000, 100, 100);
 var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 
 
+// Load textures
 var floortexture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
+var resume2texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc2.png') );
+var creamtexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
+
+// Materials
 var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
 var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
-
-var creamtexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 
-
+// Robo component
 var Robo = React.createClass({
   displayName: 'Robo',
   propTypes: {
@@ -39,7 +43,7 @@ var Robo = React.createClass({
   render: function() {
     return React.createElement(
       ReactTHREE.Object3D,
-      {position:this.props.position || new THREE.Vector3(0,0,0)},
+      {position:this.props.position || new THREE.Vector3(0,0,0), castShadow: true, receiveShadow:true },
       MeshFactory({position:new THREE.Vector3(0, +100,0), scale: new THREE.Vector3(.5,.5,.5), geometry: spheregeometry, material:creammaterial}),
       MeshFactory({position:new THREE.Vector3(0, +50,0), geometry:cylindergeometry, material:creammaterial}),
       MeshFactory({position:new THREE.Vector3(0, -100,0), scale: new THREE.Vector3(1.05,1.05,1.05), quaternion:this.props.quaternion, geometry:spheregeometry, material:creammaterial})
@@ -47,16 +51,17 @@ var Robo = React.createClass({
   }
 });
 
-var Hello = React.createClass({
+
+var VRScene = React.createClass({
     render: function() {
       var aspectratio = this.props.width / this.props.height;
       var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
         position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+1000, this.props.cupcakedata.position.z+1000), lookat:this.props.cupcakedata.position};
-      return  <Scene width={this.props.width} height={this.props.height} camera="maincamera">
+      return  <Scene width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={true}>
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
-                <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} />
-                <DirectionalLight position={new THREE.Vector3(0,0,1)} color={color} intensity={1} />
-                <Object3D quaternion={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2.0 )}>
+                <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler}  />
+                <DirectionalLight position={new THREE.Vector3(0,0,1)} color={white} intensity={1}  castShadow={true} />
+                <Object3D quaternion={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2.0 )} receiveShadow={true} >
                   <Mesh position={new THREE.Vector3(0,0,0)} geometry={planegeometry} material={solidmaterial} />
                 </Object3D>
               </Scene>;
@@ -106,7 +111,7 @@ var props = {
    }
  };
 
-var element = React.createElement(Hello, props);
+var element = React.createElement(VRScene, props);
 
 window.onkeydown = Control.keyHandler;
 window.onkeyup = Control.keyHandler;
@@ -115,10 +120,6 @@ var xstep = 0, zstep = 0;
 var friction = 1.1
 
 function render(t){
-    rotationangle = t*.001;
-    props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationangle, 3*rotationangle, 0));
-    //props.cupcakedata.position.x = 300  * Math.sin(rotationangle);
-
     if (Control.up) zstep -= 1
     else if (Control.down) zstep += 1
     else zstep /= friction;
@@ -132,9 +133,12 @@ function render(t){
     props.cupcakedata.position.x += xstep;
     //if (Control.right) props.cupcakedata.position.x += xstep;
 
+    var rotationanglex = props.cupcakedata.position.x/100;
+    var rotationangley = 0;
+    var rotationanglez = props.cupcakedata.position.z/100;
+    props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationanglez, rotationangley, rotationanglex));
 
-
-    element = React.createElement(Hello, props);
+    element = React.createElement(VRScene, props);
     ReactTHREE.render(element, document.querySelector('#container'));
     requestAnimationFrame(render);
 
