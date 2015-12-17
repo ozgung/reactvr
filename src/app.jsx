@@ -4,6 +4,7 @@ var ReactTHREE = require('./react-three-commonjs');
 var THREE = require('three');
 require('./stereoeffect');
 require('./vreffect');
+require('./orbitcontrols')
 
 var Scene = ReactTHREE.Scene;
 var PerspectiveCamera = ReactTHREE.PerspectiveCamera;
@@ -21,6 +22,9 @@ THREE.typeface_js.loadFace(typeface);
 var white = 0xffffff;
 var orange = 0xff5500;
 
+var w = window.innerWidth;
+var h = window.innerHeight;
+
 var boxgeometry = new THREE.BoxGeometry( 200,200,200);
 var spheregeometry = new THREE.SphereGeometry( 200,200,200);
 var cylindergeometry = new THREE.CylinderGeometry( 102, 100, 40, 100);
@@ -29,12 +33,14 @@ var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 
 // Load textures
 var floortexture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
+var resume1texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
 var resume2texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc2.png') );
 var creamtexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
 
 // Materials
 var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
-var solidmaterial = new THREE.MeshBasicMaterial( { map: floortexture  } );
+var resume1material = new THREE.MeshBasicMaterial( { map: resume1texture  } );
+var resume2material = new THREE.MeshBasicMaterial( { map: resume2texture  } );
 var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 var orangematerial = new THREE.MeshPhongMaterial({color: orange});
 
@@ -59,34 +65,35 @@ var Robo = React.createClass({
   }
 });
 
+var globalX=0;
+var globalY=0;
 
 var VRScene = React.createClass({
     render: function() {
       var aspectratio = this.props.width / this.props.height;
-      var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
-        position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+800, this.props.cupcakedata.position.z+1000), lookat:this.props.cupcakedata.position};
-      return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={false} effect={effect} >
-                <PerspectiveCamera name="maincamera" {...cameraprops} />
+      var cameraprops = {fov:90, aspect:aspectratio, near:1, far:100000,
+        position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+1600, this.props.cupcakedata.position.z+1000),
+        lookat: new THREE.Vector3(this.props.cupcakedata.position.x+(globalX/1), -(globalY/1),this.props.cupcakedata.position.z)  };
+      return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" orbitControls={THREE.OrbitControls} shadowMapEnabled={false} effect={effect} >
+                <PerspectiveCamera name="maincamera" {...cameraprops} quoternian={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), Math.PI / 180 * globalX )} />
                 <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} castShadow={true} receiveShadow={false} />
                 <DirectionalLight position={new THREE.Vector3(1000,1000,1000)} color={white} intensity={1} />
                 <SpotLight onlyShadow='true' position={new THREE.Vector3(-this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+10000, -this.props.cupcakedata.position.z)} color={white} intensity={1}  castShadow='true' shadowCameraLeft={-1000} shadowCameraRight={1000} shadowCameraTop={10000} shadowCameraBottom={-10000} shadowCameraNear={1} shadowCameraFar={100000} shadowMapWidth={2048} shadowMapWidth={2048} />
                 <Object3D quaternion={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), -Math.PI / 2 )} receiveShadow={false} >
-                  <Mesh position={new THREE.Vector3(0,0,0)} geometry={planegeometry} material={solidmaterial} receiveShadow={false} />
+                  <Mesh position={new THREE.Vector3(0,0,0)} geometry={planegeometry} material={resume1material} receiveShadow={false} />
+                  <Mesh position={new THREE.Vector3(0,-10000,0)} geometry={planegeometry} material={resume2material} receiveShadow={false} />
                 </Object3D>
               </Scene>;
     },
-
 });
-
-
-var w = window.innerWidth;
-var h = window.innerHeight;
 
 var Control = {
   up: false,
   down:false,
   left: false,
   right: false,
+  X: 0, prevX: null,
+  Y: 0, prevY: null,
   keyHandler: function(e){
     e = e || window.event;
     if (e.keyCode == '38') {
@@ -107,7 +114,21 @@ var Control = {
     }
     if (e.type == 'keyup' && 'C' == String.fromCharCode(e.keyCode)) {
       props.cupcakedata.position = new THREE.Vector3(0,300,0);
+      globalX=0;
+      globalY=0;
     }
+  },
+  mouseHandler: function (e){
+    e.preventDefault();
+    Control.X = e.clientX;
+    if (Control.prevX) globalX += Control.X - Control.prevX;
+    console.log(globalX);
+    Control.prevX = Control.X;
+    Control.Y = e.clientY;
+    if (Control.prevY) globalY += Control.Y - Control.prevY;
+    console.log(globalY);
+    Control.prevY = Control.Y;
+
   }
 }
 
@@ -116,7 +137,7 @@ var props = {
    width: w,
    height: h,
    cupcakedata: {
-     position:new THREE.Vector3(0,300,0),
+     position:new THREE.Vector3(-1325,300,-4000),
      quaternion:new THREE.Quaternion()
    }
  };
@@ -125,6 +146,7 @@ var element = React.createElement(VRScene, props);
 
 window.onkeydown = Control.keyHandler;
 window.onkeyup = Control.keyHandler;
+window.onmousemove = Control.mouseHandler;
 
 var xstep = 0, zstep = 0;
 var friction = 1.1
@@ -137,6 +159,11 @@ function render(t){
     if (Control.left) xstep -= 1
     else if (Control.right) xstep += 1
     else xstep /= friction;
+
+    if (!Control.left && !Control.right && !Control.up && !Control.down ){
+      globalX *= .99;
+      globalY *= .99;
+    }
 
     props.cupcakedata.position.z += zstep;
     //if (Control.down) props.cupcakedata.position.z += zstep;

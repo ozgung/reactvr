@@ -517,7 +517,7 @@ module.exports =
 
 	    getDefaultProps: function getDefaultProps() {
 	        return {
-							effect: THREE.StereoEffect, // An effect like THREE.StereoEffect.
+							effect: 'undefined', // An effect like THREE.StereoEffect.
 	            enableRapidRender: true,
 	            pixelRatio: 1,
 	            transparent: false,
@@ -610,7 +610,7 @@ module.exports =
 	            this._THREErenderer.setClearColor(props.background, this.props.transparent ? 0 : 1);
 	        }
 
-					if (true) {
+					if (props.effect !== 'undefined') {
                   this._effect = new props.effect(this._THREErenderer);
                   this._effect.setSize(props.width, props.height)
                 }
