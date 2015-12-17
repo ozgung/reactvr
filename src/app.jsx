@@ -1,7 +1,9 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var ReactTHREE = require('react-three');
+var ReactTHREE = require('./react-three-commonjs');
 var THREE = require('three');
+require('./stereoeffect');
+require('./vreffect');
 
 var Scene = ReactTHREE.Scene;
 var PerspectiveCamera = ReactTHREE.PerspectiveCamera;
@@ -37,6 +39,7 @@ var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
 var orangematerial = new THREE.MeshPhongMaterial({color: orange});
 
 // Stereo effect
+//var effect = THREE.VREffect;
 var effect = THREE.StereoEffect;
 
 // Robo component
@@ -62,7 +65,7 @@ var VRScene = React.createClass({
       var aspectratio = this.props.width / this.props.height;
       var cameraprops = {fov:50, aspect:aspectratio, near:1, far:100000,
         position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+800, this.props.cupcakedata.position.z+1000), lookat:this.props.cupcakedata.position};
-      return  <Scene ref="scene" effect={effect} width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={false} >
+      return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" shadowMapEnabled={false} effect={effect} >
                 <PerspectiveCamera name="maincamera" {...cameraprops} />
                 <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} castShadow={true} receiveShadow={false} />
                 <DirectionalLight position={new THREE.Vector3(1000,1000,1000)} color={white} intensity={1} />
