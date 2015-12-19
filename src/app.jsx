@@ -145,15 +145,6 @@ var Control = {
     Control.alpha = e.alpha;
     Control.beta = e.beta;
     Control.gamma = e.gamma;
-    // if (Control.prevX) globalX += Control.X - Control.prevX;
-    console.log(Control.alpha);
-    console.log(Control.beta);
-    console.log(Control.gamma);
-    // Control.prevX = Control.X;
-    // Control.Y = e.clientY;
-    // if (Control.prevY) globalY += Control.Y - Control.prevY;
-    // console.log(globalY);
-    // Control.prevY = Control.Y;
   }
 
 }
@@ -200,7 +191,7 @@ function render(t){
     var rotationanglex = props.cupcakedata.position.x/100;
     var rotationangley = 0;
     var rotationanglez = props.cupcakedata.position.z/100;
-    props.cupcakedata.quaternion.setFromEuler(new THREE.Euler(rotationanglez, rotationangley, rotationanglex));
+    props.cupcakedata.quaternion.setFromEuler(new THREE.Euler(rotationanglez, rotationangley, -rotationanglex, 'ZXY'));
 
     element = React.createElement(VRScene, props);
     ReactTHREE.render(element, document.querySelector('#container'));
