@@ -20,7 +20,7 @@ var typeface = require('three.regular.helvetiker');
 THREE.typeface_js.loadFace(typeface);
 
 var white = 0xffffff;
-var orange = 0xff5500;
+var orange = 0xFF903E;
 
 var w = window.innerWidth;
 var h = window.innerHeight;
@@ -35,13 +35,15 @@ var textgeometry = new THREE.TextGeometry("asdfasdfsf",{font: 'helvetiker'});
 var floortexture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
 var resume1texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc1.png') );
 var resume2texture = THREE.ImageUtils.loadTexture( assetpath('ozgungenc2.png') );
-var creamtexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
+var bodytexture = THREE.ImageUtils.loadTexture( assetpath('simple.png'));
+var headtexture = THREE.ImageUtils.loadTexture( assetpath('simple2.png'));
 
 // Materials
 var floormaterial = new THREE.MeshPhongMaterial( { map: floortexture } );
 var resume1material = new THREE.MeshBasicMaterial( { map: resume1texture  } );
 var resume2material = new THREE.MeshBasicMaterial( { map: resume2texture  } );
-var creammaterial = new THREE.MeshPhongMaterial({map: creamtexture});
+var bodymaterial = new THREE.MeshPhongMaterial({map: bodytexture});
+var headmaterial = new THREE.MeshPhongMaterial({map: headtexture});
 var orangematerial = new THREE.MeshPhongMaterial({color: orange});
 
 // Stereo effect
@@ -58,9 +60,9 @@ var Robo = React.createClass({
   },
   render: function() {
     return <Object3D position={this.props.position || new THREE.Vector3(0,0,0)} castShadow='true' receiveShadow='false'>
-      <Mesh position={new THREE.Vector3(0, +100,0)} scale={new THREE.Vector3(.5,.5,.5)} geometry={spheregeometry} material={creammaterial} castShadow='true' receiveShadow='false'/>
-      <Mesh position={new THREE.Vector3(0, +95,0)} geometry={cylindergeometry} material={orangematerial} castShadow='true' receiveShadow='false' />
-      <Mesh position={new THREE.Vector3(0, -100,0)} scale={new THREE.Vector3(1.05,1.05,1.05)} quaternion={this.props.quaternion} geometry={spheregeometry} material={creammaterial} castShadow='true' receiveShadow='false' />
+      <Mesh position={new THREE.Vector3(0, +250,0)} quaternion={new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0,0,1), Math.PI/2)} geometry={spheregeometry} material={headmaterial} castShadow='true' receiveShadow='false'/>
+      <Mesh position={new THREE.Vector3(0, +250,0)} geometry={cylindergeometry} scale={new THREE.Vector3(2,2,2)} material={orangematerial} castShadow='true' receiveShadow='false' />
+      <Mesh position={new THREE.Vector3(0, -100,0)} scale={new THREE.Vector3(2.10,2.10,2.10)} quaternion={this.props.quaternion} geometry={spheregeometry} material={bodymaterial} castShadow='true' receiveShadow='false' />
     </Object3D>
   }
 });
@@ -76,7 +78,7 @@ var VRScene = React.createClass({
         near:1,
         far:100000,
         position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+1600, this.props.cupcakedata.position.z+1000),
-        //lookat: new THREE.Vector3(this.props.cupcakedata.position.x+(globalX/1), -(globalY/1),this.props.cupcakedata.position.z),
+        lookat: (Control.alphe == null) ? new THREE.Vector3(this.props.cupcakedata.position.x+(globalX/1), -(globalY/1),this.props.cupcakedata.position.z) : undefined,
         quaternion: new THREE.Quaternion().setFromEuler(new THREE.Euler(-(Control.gamma+70)*Math.PI/180, Control.alpha*Math.PI/180, 0))
       };
       return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" orbitControls={THREE.OrbitControls} shadowMapEnabled={false} effect={effect} >
@@ -99,9 +101,9 @@ var Control = {
   right: false,
   X: 0, prevX: null,
   Y: 0, prevY: null,
-  alpha: 0, prevAlpha: null,
-  beta: 0, prevBeta: null,
-  gamma: 0, prevGamma: null,
+  alpha: null, prevAlpha: null,
+  beta: null, prevBeta: null,
+  gamma: null, prevGamma: null,
   keyHandler: function(e){
     e = e || window.event;
     if (e.keyCode == '38') {
