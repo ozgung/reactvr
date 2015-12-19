@@ -58,7 +58,7 @@ var Robo = React.createClass({
   },
   render: function() {
     return <Object3D position={this.props.position || new THREE.Vector3(0,0,0)} castShadow='true' receiveShadow='false'>
-      <Mesh position={new THREE.Vector3(0, +100,0)} scale={new THREE.Vector3(.5,.5,.5)} geometry={spheregeometry} material={creammaterial} quaternion={this.props.quaternion || new THREE.Quaternion()} castShadow='true' receiveShadow='false'/>
+      <Mesh position={new THREE.Vector3(0, +100,0)} scale={new THREE.Vector3(.5,.5,.5)} geometry={spheregeometry} material={creammaterial} castShadow='true' receiveShadow='false'/>
       <Mesh position={new THREE.Vector3(0, +95,0)} geometry={cylindergeometry} material={orangematerial} castShadow='true' receiveShadow='false' />
       <Mesh position={new THREE.Vector3(0, -100,0)} scale={new THREE.Vector3(1.05,1.05,1.05)} quaternion={this.props.quaternion} geometry={spheregeometry} material={creammaterial} castShadow='true' receiveShadow='false' />
     </Object3D>
@@ -71,11 +71,16 @@ var globalY=0;
 var VRScene = React.createClass({
     render: function() {
       var aspectratio = this.props.width / this.props.height;
-      var cameraprops = {fov:90, aspect:aspectratio, near:1, far:100000,
+      var cameraprops = {
+        fov:90, aspect:aspectratio,
+        near:1,
+        far:100000,
         position:new THREE.Vector3(this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+1600, this.props.cupcakedata.position.z+1000),
-        lookat: new THREE.Vector3(this.props.cupcakedata.position.x+(globalX/1), -(globalY/1),this.props.cupcakedata.position.z)  };
+        //lookat: new THREE.Vector3(this.props.cupcakedata.position.x+(globalX/1), -(globalY/1),this.props.cupcakedata.position.z),
+        quaternion: new THREE.Quaternion().setFromEuler(new THREE.Euler(-(Control.gamma+70)*Math.PI/180, Control.alpha*Math.PI/180, 0))
+      };
       return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" orbitControls={THREE.OrbitControls} shadowMapEnabled={false} effect={effect} >
-                <PerspectiveCamera name="maincamera" {...cameraprops} quoternian={new THREE.Quaternion().setFromAxisAngle( new THREE.Vector3( 0, 0, 1 ), Math.PI / 180 * globalX )} />
+                <PerspectiveCamera name="maincamera" {...cameraprops}   />
                 <Robo position={this.props.cupcakedata.position} quaternion={this.props.cupcakedata.quaternion} onKeyPress={this.keyHandler} castShadow={true} receiveShadow={false} />
                 <DirectionalLight position={new THREE.Vector3(1000,1000,1000)} color={white} intensity={1} />
                 <SpotLight onlyShadow='true' position={new THREE.Vector3(-this.props.cupcakedata.position.x, this.props.cupcakedata.position.y+10000, -this.props.cupcakedata.position.z)} color={white} intensity={1}  castShadow='true' shadowCameraLeft={-1000} shadowCameraRight={1000} shadowCameraTop={10000} shadowCameraBottom={-10000} shadowCameraNear={1} shadowCameraFar={100000} shadowMapWidth={2048} shadowMapWidth={2048} />
@@ -94,6 +99,9 @@ var Control = {
   right: false,
   X: 0, prevX: null,
   Y: 0, prevY: null,
+  alpha: 0, prevAlpha: null,
+  beta: 0, prevBeta: null,
+  gamma: 0, prevGamma: null,
   keyHandler: function(e){
     e = e || window.event;
     if (e.keyCode == '38') {
@@ -128,8 +136,24 @@ var Control = {
     if (Control.prevY) globalY += Control.Y - Control.prevY;
     console.log(globalY);
     Control.prevY = Control.Y;
-
+  },
+  orientationHandler: function (e){
+    console.log(e);
+    e.preventDefault();
+    Control.alpha = e.alpha;
+    Control.beta = e.beta;
+    Control.gamma = e.gamma;
+    // if (Control.prevX) globalX += Control.X - Control.prevX;
+    console.log(Control.alpha);
+    console.log(Control.beta);
+    console.log(Control.gamma);
+    // Control.prevX = Control.X;
+    // Control.Y = e.clientY;
+    // if (Control.prevY) globalY += Control.Y - Control.prevY;
+    // console.log(globalY);
+    // Control.prevY = Control.Y;
   }
+
 }
 
 
@@ -147,6 +171,7 @@ var element = React.createElement(VRScene, props);
 window.onkeydown = Control.keyHandler;
 window.onkeyup = Control.keyHandler;
 window.onmousemove = Control.mouseHandler;
+window.ondeviceorientation = Control.orientationHandler;
 
 var xstep = 0, zstep = 0;
 var friction = 1.1
@@ -173,7 +198,7 @@ function render(t){
     var rotationanglex = props.cupcakedata.position.x/100;
     var rotationangley = 0;
     var rotationanglez = props.cupcakedata.position.z/100;
-    props.cupcakedata.quaternion.setFromEuler(new THREE. Euler(rotationanglez, rotationangley, rotationanglex));
+    props.cupcakedata.quaternion.setFromEuler(new THREE.Euler(rotationanglez, rotationangley, rotationanglex));
 
     element = React.createElement(VRScene, props);
     ReactTHREE.render(element, document.querySelector('#container'));

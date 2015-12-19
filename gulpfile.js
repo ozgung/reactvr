@@ -68,7 +68,8 @@ gulp.task('serve', function(done) {
           }
         }
       },
-      open: true
+      open: true,
+      host: "0.0.0.0"
     }));
 });
 
