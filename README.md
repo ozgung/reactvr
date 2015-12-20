@@ -2,14 +2,16 @@ A 3D scene based on React-Three
 
 My resumé on VR: http://ozgungenc.com/reactvr/
 
+====
+
 ###Control###
 
-####PC:
+####PC:####
 - use arrow keys to move the droid
 - Use mouse to look around
 - 'C' to center the droid back to scene
 
-####Cardboard or VR headsets (not tested):
+####Cardboard or VR headsets (not tested):####
 - Just look around
 
 ====
@@ -23,7 +25,7 @@ My resumé on VR: http://ozgungenc.com/reactvr/
 	> gulp
 ```
 
-##TODO:
+####ToDo:####
 - Head tilt and movement for the droid
 - Better controls
 - Add server-side/Websockets support and evolve this into a multiplayer game.
