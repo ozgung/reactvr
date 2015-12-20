@@ -89,8 +89,8 @@ var VRScene = React.createClass({
         fov:90, aspect:aspectratio,
         near:1,
         far:100000,
-        position:new THREE.Vector3(this.props.robodata.position.x, this.props.robodata.position.y+1600, this.props.robodata.position.z+1000),
-        lookat: (Control.alphe == null) ? new THREE.Vector3(this.props.robodata.position.x+(globalX/1), -(globalY/1),this.props.robodata.position.z) : undefined,
+        position:new THREE.Vector3(this.props.robodata.position.x, this.props.robodata.position.y+1000, this.props.robodata.position.z+800),
+        lookat: (Control.alpha == null) ? new THREE.Vector3(this.props.robodata.position.x+(globalX/1), -(globalY/1),this.props.robodata.position.z) : undefined,
         quaternion: new THREE.Quaternion().setFromEuler(new THREE.Euler(-(Control.gamma+70)*Math.PI/180, Control.alpha*Math.PI/180, 0))
       };
       return  <Scene ref="scene" width={this.props.width} height={this.props.height} camera="maincamera" orbitControls={THREE.OrbitControls} shadowMapEnabled={true} effect={effect} >
