@@ -26,4 +26,4 @@ My resumé on VR: http://ozgungenc.com/reactvr/
 ####Todo:####
 - Head tilt and movement for the droid
 - Better controls
-- Add server-side/Websockets support and evolve this into a multiplayer game.
+- Add server-side/Websockets support (ozgung/reactvr-server) and evolve this into a multiplayer game.
